@@ -2,9 +2,6 @@
 import drawsvg as dw
 import numpy as np
 
-# from tracks_3d_with_graph import viewer
-from tracks_3d import viewer
-
 from napari.layers import Tracks
 from napari._vispy.filters.tracks import TracksFilter
 from napari._vispy.visuals.tracks import TracksVisual
@@ -157,7 +154,9 @@ def tracks2svg(
     return d
 
 
-def main() -> None:
+def _main() -> None:
+    # from tracks_3d_with_graph import viewer
+    from tracks_3d import viewer
 
     layer: Tracks = viewer.layers['tracks']
 
@@ -171,4 +170,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    _main()

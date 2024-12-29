@@ -32,7 +32,7 @@ def text2svg(
     text_visual.update()
 
     text = text_visual.text
-    color = text_visual.color.hex[0].upper()
+    color = text_visual.color.hex[0]
     font_size = text_visual.font_size
 
     pos = text_visual.get_transform(
