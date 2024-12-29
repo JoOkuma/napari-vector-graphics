@@ -36,14 +36,18 @@ def main() -> None:
 
     start = 0
     for stop in line_stops:
-        line = dw.Lines(
-            *pos[start:stop].ravel(),
-            close=False,
+        rgb_color = "rgb({}, {}, {})".format(
+            *(node.color[start, :3] * 255)
+        )
+        path = dw.Path(
             fill='none',
-            stroke='black',
+            stroke=rgb_color,
             stroke_width=node.width,
         )
-        d.append(line)
+        path.M(*pos[start])
+        for p in pos[start + 1:stop]:
+            path.L(*p)
+        d.append(path)
         start = stop
 
     d.save_svg('pic.svg')
