@@ -1,23 +1,23 @@
 import drawsvg as dw
 import numpy as np
 
-from vispy.scene.visuals import Text
+from vispy.scene.visuals import Line
 
 
-def text2svg(
-    text_visual: Text,
+def line2svg(
+    line_visual: Line,
     d: dw.Drawing | dw.Group | None,
 ) -> dw.Drawing | dw.Group | None:
     """
-    Convert a vispy TextVisual to a drawsvg Drawing.
+    Convert a vispy LineVisual to a drawsvg Drawing.
 
-    If the TextVisual is not visible, the Drawing is not modified and
+    If the LineVisual is not visible, the Drawing is not modified and
     it will return None if it was None.
 
     Parameters
     ----------
-    text_visual : Text
-        The vispy TextVisual to convert.
+    line_visual : Line
+        The vispy LineVisual to convert.
     d : dw.Drawing | dw.Group | None
         The drawsvg Drawing to append to. If None, a new Drawing is created.
     
@@ -26,19 +26,21 @@ def text2svg(
     d : dw.Drawing | dw.Group | None
         The drawsvg Drawing or Group.
     """
+    return d
+    # TODO: Implement this function
 
-    if not text_visual.visible:
+    if not line_visual.visible:
         return d
     
-    text_visual.update()
+    line_visual.update()
 
-    text = text_visual.text
-    color = text_visual.color.hex[0]
-    font_size = text_visual.font_size
+    text = line_visual.text
+    color = line_visual.color.hex[0]
+    font_size = line_visual.font_size
 
-    pos = text_visual.get_transform(
+    pos = line_visual.get_transform(
         map_from='visual', map_to='canvas'
-    ).map(text_visual.pos)
+    ).map(line_visual.pos)
 
     if d is None:
         d = dw.Drawing()

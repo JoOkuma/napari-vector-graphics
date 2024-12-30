@@ -1,21 +1,19 @@
 import drawsvg as dw
-import io
-import base64
 import tempfile
 import imageio
-from pathlib import Path
 
+import napari
 from napari.layers import Image
 from napari.viewer import current_viewer
-from napari._vispy.layers.image import ImageLayerNode
-
 
 def image2svg(
     layer: Image,
     d: dw.Drawing | dw.Group | None = None,
+    viewer: napari.Viewer | None = None,
 ) -> dw.Drawing | dw.Group | None:
 
-    viewer = current_viewer()
+    if viewer is None:
+        viewer = current_viewer()
 
     if d is None:
         height, width = viewer._canvas_size

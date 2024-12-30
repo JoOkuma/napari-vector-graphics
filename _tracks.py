@@ -7,6 +7,7 @@ from napari._vispy.filters.tracks import TracksFilter
 from napari._vispy.visuals.tracks import TracksVisual
 from vispy.visuals.line import LineVisual
 
+import napari
 from napari.viewer import current_viewer
 from _text import text2svg
 
@@ -23,6 +24,7 @@ def tracks2svg(
     layer: Tracks,
     circle_radius: int = 0,
     d: dw.Drawing | dw.Group | None = None,
+    viewer: napari.Viewer | None = None,
 ) -> dw.Drawing | dw.Group:
     """
     Convert a napari Tracks layer to a drawsvg Drawing.
@@ -42,7 +44,8 @@ def tracks2svg(
     d : dw.Drawing
         The drawsvg Drawing.
     """
-    viewer = current_viewer()
+    if viewer is None:
+        viewer = current_viewer()
 
     node: TracksVisual = viewer.window._qt_viewer.canvas.layer_to_visual[layer].node
 
