@@ -9,11 +9,30 @@ from napari.viewer import current_viewer
 
 from _utils import hide_all
 
+
 def image2svg(
     layers: Image | Sequence[Image] | None = None,
     d: dw.Drawing | dw.Group | None = None,
     viewer: napari.Viewer | None = None,
 ) -> dw.Drawing | dw.Group | None:
+    """
+    Convert a napari image layer to an SVG drawing.
+
+    Parameters
+    ----------
+    layers : Image | Sequence[Image] | None
+        The image layer(s) to convert.
+        All images from the sequence are blended together.
+    d : dw.Drawing | dw.Group | None
+        The SVG drawing to append to. If None, a new drawing is created.
+    viewer : napari.Viewer | None
+        The napari viewer to convert from.
+
+    Returns
+    -------
+    dw.Drawing | dw.Group | None
+        The SVG drawing.
+    """
 
     if viewer is None:
         viewer = current_viewer()
