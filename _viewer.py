@@ -1,21 +1,27 @@
 
 from contextlib import nullcontext
+from typing import Literal
 
 import drawsvg as dw
 import napari
 
-from napari.layers import Image, Tracks
+from napari.layers import Image, Labels, Tracks
 
 from _image import image2svg
 from _tracks import tracks2svg
 from _scaler_bar import scaler_bar2svg
+from _labels import labels2svg
 from _utils import fit_canvas_to_content
+
+
+_LABELS_MODES = ("auto", "raster", "vector")
 
 
 def viewer2svg(
     viewer: napari.Viewer,
     d: dw.Drawing | dw.Group | None = None,
     blend_rasterized: bool = True,
+    labels_mode: Literal["auto", "raster", "vector"] = "auto",
     fit_content: bool = False,
 ) -> dw.Drawing | dw.Group:
     """
@@ -29,6 +35,11 @@ def viewer2svg(
         The SVG drawing to append to. If None, a new drawing is created.
     blend_rasterized : bool
         Whether to blend rasterized layers (Image, Labels).
+    labels_mode : {"auto", "raster", "vector"}
+        The mode to render labels.
+        - "auto": render as vector if 2D, else as raster.
+        - "raster": render as raster.
+        - "vector": render as vector if 2D otherwise error.
     fit_content : bool
         Whether to fit the canvas to the content.
 
@@ -37,6 +48,18 @@ def viewer2svg(
     dw.Drawing | dw.Group
         The SVG drawing.
     """
+    if labels_mode not in _LABELS_MODES:
+        raise ValueError(f"Invalid labels_mode {labels_mode}. Expected {_LABELS_MODES}.")
+
+    if viewer.dims.ndim > 2:
+        if labels_mode == "vector":
+            raise ValueError("Labels mode 'vector' is only available in 2D mode.")
+
+        elif labels_mode == "auto":
+            labels_mode = "raster"
+
+    elif labels_mode == "auto":
+        labels_mode = "vector"
 
     with fit_canvas_to_content(viewer) if fit_content else nullcontext():
 
@@ -48,6 +71,11 @@ def viewer2svg(
             blending_layers = [
                 l for l in viewer.layers if isinstance(l, Image) and l.visible
             ]
+            if labels_mode == "raster":
+                blending_layers.extend(
+                    l for l in viewer.layers if isinstance(l, Labels) and l.visible
+                )
+
             image2svg(blending_layers, d=d, viewer=viewer)
 
         for layer in viewer.layers:
@@ -57,6 +85,16 @@ def viewer2svg(
             if isinstance(layer, Image):
                 if not blend_rasterized:
                     d = image2svg(layer, d=d, viewer=viewer)
+
+            elif isinstance(layer, Labels):
+                if labels_mode == "raster" and not blend_rasterized:
+                    d = image2svg(layer, d=d, viewer=viewer)
+
+                elif labels_mode == "vector":
+                    d = labels2svg(layer, d=d, viewer=viewer)
+
+                else:
+                    raise ValueError(f"Expected labels_mode to be 'raster' or 'vector'. Found {labels_mode}.")
 
             elif isinstance(layer, Tracks):
                 d = tracks2svg(layer, d=d, viewer=viewer)
