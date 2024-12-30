@@ -3,6 +3,8 @@ import numpy as np
 
 from vispy.scene.visuals import Line
 
+from _utils import color2rgba
+
 
 def line2svg(
     line_visual: Line,
@@ -26,17 +28,15 @@ def line2svg(
     d : dw.Drawing | dw.Group | None
         The drawsvg Drawing or Group.
     """
-    return d
-    # TODO: Implement this function
-
     if not line_visual.visible:
         return d
     
-    line_visual.update()
+    if line_visual.connect != "segments":
+        raise NotImplementedError(
+            f"Only 'segments' connection is supported, got {line_visual.connect}."
+        )
 
-    text = line_visual.text
-    color = line_visual.color.hex[0]
-    font_size = line_visual.font_size
+    line_visual.update()
 
     pos = line_visual.get_transform(
         map_from='visual', map_to='canvas'
@@ -45,18 +45,18 @@ def line2svg(
     if d is None:
         d = dw.Drawing()
     
-    if isinstance(text, str):
-        text = [text]
+    if pos.ndim == 1:
         pos = np.atleast_2d(pos)
 
-    for i in range(len(text)):
+    pos = pos[:, :2]
+
+    for i in range(0, len(pos), 2):
         d.append(
-            dw.Text(
-                text[i],
-                font_size,
-                x=pos[i, 0],
-                y=pos[i, 1],
-                stroke=color,
+            dw.Line(
+                *pos[i],
+                *pos[i + 1],
+                stroke=color2rgba(line_visual.color),
+                stroke_width=line_visual.width,
             )
         )
 

@@ -9,7 +9,9 @@ from vispy.visuals.line import LineVisual
 
 import napari
 from napari.viewer import current_viewer
+
 from _text import text2svg
+from _utils import color2rgba
 
 
 def _get_track_filter(line_visual: LineVisual) -> TracksFilter:
@@ -103,9 +105,7 @@ def tracks2svg(
 
             # Convert color to RGB
             # NOTE: unlike napari these aren't interpolated between vertices
-            rgb_color = "rgb({}, {}, {})".format(
-                *(track_visual.color[start, :3] * 255)
-            )
+            rgb_color = color2rgba(track_visual.color[i])
 
             # Add the line segment if visible
             # I don't really know why people would want to draw invisible lines

@@ -51,10 +51,12 @@ def text2svg(
         d.append(
             dw.Text(
                 text[i],
-                font_size,
+                font_size=font_size,
                 x=pos[i, 0],
                 y=pos[i, 1],
                 stroke=color,
+                text_anchor='middle',
+                dominant_baseline='text-bottom',
             )
         )
 

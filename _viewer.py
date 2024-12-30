@@ -30,28 +30,31 @@ def viewer2svg(
             continue
 
         if isinstance(layer, Image):
-            d = image2svg(layer, dw=d, viewer=viewer)
+            d = image2svg(layer, d=d, viewer=viewer)
 
         elif isinstance(layer, Tracks):
-            d = tracks2svg(layer, dw=d, viewer=viewer)
+            d = tracks2svg(layer, d=d, viewer=viewer)
         
         else:
             raise ValueError(f"Layer type {type(layer)} not supported yet.")
         
     if viewer.scale_bar.visible:
         scaler_bar2svg(viewer, d=d)
-        
+
     return d
 
 
 def _main() -> None:
     import napari
+    from skimage.data import cells3d
 
     viewer = napari.Viewer()
+    viewer.add_image(cells3d(), channel_axis=1)
+
     viewer.scale_bar.visible = True
 
     d = viewer2svg(viewer)
-    d.save_svg("napari.svg")
+    d.save_png("pic.png")
 
 
 if __name__ == "__main__":
