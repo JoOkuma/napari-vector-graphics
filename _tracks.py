@@ -22,8 +22,8 @@ def _get_track_filter(line_visual: LineVisual) -> TracksFilter:
 def tracks2svg(
     layer: Tracks,
     circle_radius: int = 0,
-    d: dw.Drawing | None = None,
-) -> dw.Drawing:
+    d: dw.Drawing | dw.Group | None = None,
+) -> dw.Drawing | dw.Group:
     """
     Convert a napari Tracks layer to a drawsvg Drawing.
 

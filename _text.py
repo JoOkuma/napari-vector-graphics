@@ -5,8 +5,8 @@ from vispy.scene.visuals import Text
 
 def text2svg(
     text_visual: Text,
-    d: dw.Drawing | None,
-) -> dw.Drawing | None:
+    d: dw.Drawing | dw.Group | None,
+) -> dw.Drawing | dw.Group | None:
     """
     Convert a vispy TextVisual to a drawsvg Drawing.
 
@@ -17,13 +17,13 @@ def text2svg(
     ----------
     text_visual : Text
         The vispy TextVisual to convert.
-    d : dw.Drawing | None
+    d : dw.Drawing | dw.Group | None
         The drawsvg Drawing to append to. If None, a new Drawing is created.
     
     Returns
     -------
-    d : dw.Drawing | None
-        The drawsvg Drawing.
+    d : dw.Drawing | dw.Group | None
+        The drawsvg Drawing or Group.
     """
 
     if not text_visual.visible:
