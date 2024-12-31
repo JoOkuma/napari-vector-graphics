@@ -1,0 +1,30 @@
+name: napari-vector-graphics
+display_name: Napari Vector Graphics
+# use 'hidden' to remove plugin from napari hub search results
+visibility: public
+# see https://napari.org/stable/plugins/manifest.html for valid categories
+categories: ["Annotation", "Segmentation", "Acquisition"]
+contributions:
+  commands:
+    - id: napari-vector-graphics.make_container_widget
+      python_name: napari_vector_graphics:ImageThreshold
+      title: Make threshold Container widget
+    - id: napari-vector-graphics.make_magic_widget
+      python_name: napari_vector_graphics:threshold_magic_widget
+      title: Make threshold magic widget
+    - id: napari-vector-graphics.make_function_widget
+      python_name: napari_vector_graphics:threshold_autogenerate_widget
+      title: Make threshold function widget
+    - id: napari-vector-graphics.make_qwidget
+      python_name: napari_vector_graphics:ExampleQWidget
+      title: Make example QWidget
+  widgets:
+    - command: napari-vector-graphics.make_container_widget
+      display_name: Container Threshold
+    - command: napari-vector-graphics.make_magic_widget
+      display_name: Magic Threshold
+    - command: napari-vector-graphics.make_function_widget
+      autogenerate: true
+      display_name: Autogenerate Threshold
+    - command: napari-vector-graphics.make_qwidget
+      display_name: Example QWidget
