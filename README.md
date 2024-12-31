@@ -27,6 +27,10 @@ You can install `napari-vector-graphics` via [pip]:
 
     pip install napari-vector-graphics
 
+If you want to be able to vectorize segmentation layers, you will need `python-opencv-headless`.
+To install it, run:
+
+    pip install "napari-vector-graphics[all]"
 
 
 To install latest development version :
