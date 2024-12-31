@@ -95,7 +95,7 @@ def viewer2svg(
                 d = tracks2svg(layer, d=d, viewer=viewer)
 
             else:
-                raise ValueError(f"Layer type {type(layer)} not supported yet.")
+                raise ValueError(f"Layer type {type(layer)} not supported yet. Disable the layer and try again.")
 
         if viewer.scale_bar.visible:
             scaler_bar2svg(viewer, d=d)
