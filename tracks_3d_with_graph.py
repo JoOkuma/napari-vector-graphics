@@ -5,9 +5,8 @@ Tracks 3D with graph
 .. tags:: visualization-advanced
 """
 
-import numpy as np
-
 import napari
+import numpy as np
 
 
 def _circle(r, theta):
@@ -39,7 +38,7 @@ def tracks_3d_merge_split():
 
     graph = {1: 0, 2: [0], 3: [1, 2]}
 
-    features = {'time': tracks[:, 1]}
+    features = {"time": tracks[:, 1]}
 
     return tracks, features, graph
 
@@ -48,8 +47,8 @@ tracks, features, graph = tracks_3d_merge_split()
 vertices = tracks[:, 1:]
 
 viewer = napari.Viewer(ndisplay=3)
-viewer.add_points(vertices, size=1, name='points', opacity=0.3)
-viewer.add_tracks(tracks, features=features, graph=graph, name='tracks')
+viewer.add_points(vertices, size=1, name="points", opacity=0.3)
+viewer.add_tracks(tracks, features=features, graph=graph, name="tracks")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     napari.run()

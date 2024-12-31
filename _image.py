@@ -1,8 +1,8 @@
-import drawsvg as dw
 import tempfile
-import imageio
 from typing import Sequence
 
+import drawsvg as dw
+import imageio
 import napari
 from napari.layers import Image, Labels
 from napari.viewer import current_viewer
@@ -40,9 +40,11 @@ def image2svg(
     if d is None:
         height, width = viewer._canvas_size
         d = dw.Drawing(width, height, id_prefix="image_")
-    
+
     with hide_all(viewer, layers):
-        image = viewer.window._qt_viewer.canvas._scene_canvas.render(bgcolor="transparent")
+        image = viewer.window._qt_viewer.canvas._scene_canvas.render(
+            bgcolor="transparent"
+        )
 
     with tempfile.NamedTemporaryFile(suffix=".png") as f:
         imageio.imwrite(f.name, image)
@@ -76,5 +78,5 @@ def _main() -> None:
     napari.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main()

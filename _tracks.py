@@ -1,14 +1,11 @@
-
 import drawsvg as dw
+import napari
 import numpy as np
-
-from napari.layers import Tracks
 from napari._vispy.filters.tracks import TracksFilter
 from napari._vispy.visuals.tracks import TracksVisual
-from vispy.visuals.line import LineVisual
-
-import napari
+from napari.layers import Tracks
 from napari.viewer import current_viewer
+from vispy.visuals.line import LineVisual
 
 from _text import text2svg
 from _utils import color2rgba
@@ -40,7 +37,7 @@ def tracks2svg(
         This is an extra feature not present in default napari.
     d : dw.Drawing | None
         The drawsvg Drawing to append to. If None, a new Drawing is created.
-    
+
     Returns
     -------
     d : dw.Drawing
@@ -49,14 +46,16 @@ def tracks2svg(
     if viewer is None:
         viewer = current_viewer()
 
-    node: TracksVisual = viewer.window._qt_viewer.canvas.layer_to_visual[layer].node
+    node: TracksVisual = viewer.window._qt_viewer.canvas.layer_to_visual[
+        layer
+    ].node
 
     track_visual: LineVisual = node._subvisuals[0]
     track_visual.update()
 
     # Mapping to canvas coordinates
     data2canvas = track_visual.get_transform(
-        map_from='visual', map_to='canvas'
+        map_from="visual", map_to="canvas"
     )
     canvas_data = data2canvas.map(track_visual._pos)
     pos = canvas_data[:, :2]
@@ -119,11 +118,13 @@ def tracks2svg(
                         stroke_opacity=opacity[i],
                     )
                 )
-            
+
             # Add division if there is a graph
             if i == start and graph is not None:
                 for parent_track_id in graph.get(track_ids[i], []):
-                    p = layer._manager._vertex_indices_from_id(parent_track_id)[-1]
+                    p = layer._manager._vertex_indices_from_id(
+                        parent_track_id
+                    )[-1]
                     g.append(
                         dw.Line(
                             *pos[p],
@@ -149,11 +150,11 @@ def tracks2svg(
 
         d.append(g)
         start = stop
-    
+
     # Add text if visible
     if node._subvisuals[1].visible:
         d = text2svg(node._subvisuals[1], d)
-    
+
     return d
 
 
@@ -161,7 +162,7 @@ def _main() -> None:
     # from tracks_3d_with_graph import viewer
     from tracks_3d import viewer
 
-    layer: Tracks = viewer.layers['tracks']
+    layer: Tracks = viewer.layers["tracks"]
 
     layer.display_id = True
     layer.tail_length = 125
@@ -169,8 +170,8 @@ def _main() -> None:
 
     d = tracks2svg(layer, circle_radius=10)
 
-    d.save_svg('pic.svg')
+    d.save_svg("pic.svg")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     _main()

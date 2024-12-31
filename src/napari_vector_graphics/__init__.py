@@ -1,8 +1,8 @@
 try:
-    from ._version import version as __version__
+    from napari_vector_graphics._version import version as __version__
 except ImportError:
     __version__ = "unknown"
-from ._widget import (
+from napari_vector_graphics._widget import (
     ExampleQWidget,
     ImageThreshold,
     threshold_autogenerate_widget,

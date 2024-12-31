@@ -1,6 +1,12 @@
-from pathlib import Path
-
-from qtpy.QtWidgets import QWidget, QVBoxLayout, QLabel, QCheckBox, QComboBox, QFileDialog, QPushButton
+from qtpy.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QFileDialog,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from _viewer import viewer2svg
 
@@ -13,7 +19,7 @@ class NapariVectorGraphicsWidget(QWidget):
 
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
-        
+
         self._main_label = QLabel("Vector Graphics Export Options", self)
         self._layout.addWidget(self._main_label)
 
@@ -60,7 +66,7 @@ class NapariVectorGraphicsWidget(QWidget):
             caption="Save File As",
             directory="",
             filter="SVG Files (*.svg)",
-            options=options
+            options=options,
         )
 
         if file_path:

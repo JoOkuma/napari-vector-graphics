@@ -1,6 +1,5 @@
 import drawsvg as dw
 import numpy as np
-
 from vispy.scene.visuals import Line
 
 from _utils import color2rgba
@@ -22,7 +21,7 @@ def line2svg(
         The vispy LineVisual to convert.
     d : dw.Drawing | dw.Group | None
         The drawsvg Drawing to append to. If None, a new Drawing is created.
-    
+
     Returns
     -------
     d : dw.Drawing | dw.Group | None
@@ -30,7 +29,7 @@ def line2svg(
     """
     if not line_visual.visible:
         return d
-    
+
     if line_visual.connect != "segments":
         raise NotImplementedError(
             f"Only 'segments' connection is supported, got {line_visual.connect}."
@@ -38,13 +37,13 @@ def line2svg(
 
     line_visual.update()
 
-    pos = line_visual.get_transform(
-        map_from='visual', map_to='canvas'
-    ).map(line_visual.pos)
+    pos = line_visual.get_transform(map_from="visual", map_to="canvas").map(
+        line_visual.pos
+    )
 
     if d is None:
         d = dw.Drawing()
-    
+
     if pos.ndim == 1:
         pos = np.atleast_2d(pos)
 

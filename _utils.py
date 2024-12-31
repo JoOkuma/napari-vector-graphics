@@ -1,10 +1,8 @@
-
-from typing import Any, Generator, Sequence
 from contextlib import contextmanager
+from typing import Any, Generator, Sequence
 
 import napari
 import numpy as np
-
 from napari.layers import Layer
 from vispy.color import ColorArray
 
@@ -29,35 +27,35 @@ def color2rgba(color: ColorArray | np.ndarray, factor: int = 255) -> str:
 
 
 @contextmanager
-def hide_all(viewer: napari.Viewer, ignore: Any | Sequence[Any]) -> Generator[None, None, None]:
+def hide_all(
+    viewer: napari.Viewer, ignore: Any | Sequence[Any]
+) -> Generator[None, None, None]:
 
     elements = {}
+    ignore = {ignore} if isinstance(ignore, Layer) else set(ignore)
 
-    if isinstance(ignore, Layer):
-        ignore = {ignore}
-    else:
-        ignore = set(ignore)
+    for layer in viewer.layers:
+        if layer in ignore:
+            continue
+        elements[layer] = layer.visible
+        layer.visible = False
 
-    for l in viewer.layers:
-        if l in ignore:
+    for layer in viewer._overlays.values():
+        if layer in ignore:
             continue
-        elements[l] = l.visible
-        l.visible = False
-    
-    for l in viewer._overlays.values():
-        if l in ignore:
-            continue
-        elements[l] = l.visible
-        l.visible = False
-        
+        elements[layer] = layer.visible
+        layer.visible = False
+
     yield
-    
-    for l, v in elements.items():
-        l.visible = v
+
+    for layer, status in elements.items():
+        layer.visible = status
 
 
 @contextmanager
-def fit_canvas_to_content(viewer: napari.Viewer) -> Generator[None, None, None]:
+def fit_canvas_to_content(
+    viewer: napari.Viewer,
+) -> Generator[None, None, None]:
     """
     Fit the canvas to the content of a napari viewer.
 
@@ -76,12 +74,8 @@ def fit_canvas_to_content(viewer: napari.Viewer) -> Generator[None, None, None]:
     prev_zoom = viewer.camera.zoom
     prev_center = viewer.camera.center
 
-    extent_world = viewer.layers.extent.world[1][
-        -ndisplay:
-    ]
-    extent_step = min(
-        viewer.layers.extent.step[-ndisplay:]
-    )
+    extent_world = viewer.layers.extent.world[1][-ndisplay:]
+    extent_step = min(viewer.layers.extent.step[-ndisplay:])
     size = extent_world / extent_step + 1
     size = np.asarray(size) / viewer.window._qt_window.devicePixelRatio()
 

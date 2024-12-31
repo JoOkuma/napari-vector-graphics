@@ -7,9 +7,8 @@ Tracks 3D
 .. tags:: visualization-advanced
 """
 
-import numpy as np
-
 import napari
+import numpy as np
 
 
 def lissajous(t):
@@ -20,7 +19,7 @@ def lissajous(t):
 
 
 def tracks_3d(num_tracks=10):
-    """ create 3d+t track data """
+    """create 3d+t track data"""
     tracks = []
 
     for track_id in range(num_tracks):
@@ -43,8 +42,8 @@ def tracks_3d(num_tracks=10):
         gy = np.gradient(track[:, 3])
         gx = np.gradient(track[:, 4])
 
-        speed = np.sqrt(gx ** 2 + gy ** 2 + gz ** 2)
-        distance = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        speed = np.sqrt(gx**2 + gy**2 + gz**2)
+        distance = np.sqrt(x**2 + y**2 + z**2)
 
         track[:, 5] = gz
         track[:, 6] = gy
@@ -58,12 +57,12 @@ def tracks_3d(num_tracks=10):
     data = tracks[:, :5]  # just the coordinate data
 
     features = {
-        'time': tracks[:, 1],
-        'gradient_z': tracks[:, 5],
-        'gradient_y': tracks[:, 6],
-        'gradient_x': tracks[:, 7],
-        'speed': tracks[:, 8],
-        'distance': tracks[:, 9],
+        "time": tracks[:, 1],
+        "gradient_z": tracks[:, 5],
+        "gradient_y": tracks[:, 6],
+        "gradient_x": tracks[:, 7],
+        "speed": tracks[:, 8],
+        "distance": tracks[:, 9],
     }
 
     graph = {}
@@ -74,8 +73,8 @@ tracks, features, graph = tracks_3d(num_tracks=100)
 vertices = tracks[:, 1:]
 
 viewer = napari.Viewer(ndisplay=3)
-viewer.add_points(vertices, size=1, name='points', opacity=0.3)
-viewer.add_tracks(tracks, features=features, name='tracks')
+viewer.add_points(vertices, size=1, name="points", opacity=0.3)
+viewer.add_tracks(tracks, features=features, name="tracks")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     napari.run()

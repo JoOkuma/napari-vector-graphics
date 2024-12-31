@@ -1,6 +1,5 @@
 import drawsvg as dw
 import numpy as np
-
 from vispy.scene.visuals import Text
 
 
@@ -20,7 +19,7 @@ def text2svg(
         The vispy TextVisual to convert.
     d : dw.Drawing | dw.Group | None
         The drawsvg Drawing to append to. If None, a new Drawing is created.
-    
+
     Returns
     -------
     d : dw.Drawing | dw.Group | None
@@ -29,20 +28,20 @@ def text2svg(
 
     if not text_visual.visible:
         return d
-    
+
     text_visual.update()
 
     text = text_visual.text
     color = text_visual.color.hex[0]
     font_size = text_visual.font_size
 
-    pos = text_visual.get_transform(
-        map_from='visual', map_to='canvas'
-    ).map(text_visual.pos)
+    pos = text_visual.get_transform(map_from="visual", map_to="canvas").map(
+        text_visual.pos
+    )
 
     if d is None:
         d = dw.Drawing()
-    
+
     if isinstance(text, str):
         text = [text]
         pos = np.atleast_2d(pos)
@@ -55,8 +54,8 @@ def text2svg(
                 x=pos[i, 0],
                 y=pos[i, 1],
                 stroke=color,
-                text_anchor='middle',
-                dominant_baseline='text-bottom',
+                text_anchor="middle",
+                dominant_baseline="text-bottom",
             )
         )
 
