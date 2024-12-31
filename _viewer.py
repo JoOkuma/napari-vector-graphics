@@ -20,7 +20,7 @@ _LABELS_MODES = ("auto", "raster", "vector")
 def viewer2svg(
     viewer: napari.Viewer,
     d: dw.Drawing | dw.Group | None = None,
-    blend_rasterized: bool = True,
+    blend_images: bool = True,
     labels_mode: Literal["auto", "raster", "vector"] = "auto",
     fit_content: bool = False,
 ) -> dw.Drawing | dw.Group:
@@ -33,8 +33,8 @@ def viewer2svg(
         The napari viewer to convert.
     d : dw.Drawing | dw.Group | None
         The SVG drawing to append to. If None, a new drawing is created.
-    blend_rasterized : bool
-        Whether to blend rasterized layers (Image, Labels).
+    blend_images : bool
+        Whether to blend rasterized Image layers.
     labels_mode : {"auto", "raster", "vector"}
         The mode to render labels.
         - "auto": render as vector if 2D, else as raster.
@@ -51,7 +51,7 @@ def viewer2svg(
     if labels_mode not in _LABELS_MODES:
         raise ValueError(f"Invalid labels_mode {labels_mode}. Expected {_LABELS_MODES}.")
 
-    if viewer.dims.ndim > 2:
+    if viewer.dims.ndisplay > 2:
         if labels_mode == "vector":
             raise ValueError("Labels mode 'vector' is only available in 2D mode.")
 
@@ -67,15 +67,10 @@ def viewer2svg(
             height, width = viewer._canvas_size
             d = dw.Drawing(width, height, id_prefix="napari_")
         
-        if blend_rasterized:
+        if blend_images:
             blending_layers = [
                 l for l in viewer.layers if isinstance(l, Image) and l.visible
             ]
-            if labels_mode == "raster":
-                blending_layers.extend(
-                    l for l in viewer.layers if isinstance(l, Labels) and l.visible
-                )
-
             image2svg(blending_layers, d=d, viewer=viewer)
 
         for layer in viewer.layers:
@@ -83,11 +78,11 @@ def viewer2svg(
                 continue
 
             if isinstance(layer, Image):
-                if not blend_rasterized:
+                if not blend_images:
                     d = image2svg(layer, d=d, viewer=viewer)
 
             elif isinstance(layer, Labels):
-                if labels_mode == "raster" and not blend_rasterized:
+                if labels_mode == "raster":
                     d = image2svg(layer, d=d, viewer=viewer)
 
                 elif labels_mode == "vector":
@@ -115,10 +110,19 @@ def _main() -> None:
     viewer = napari.Viewer()
     viewer.add_image(cells3d(), channel_axis=1)
 
+    image = viewer.layers[1].data
+    mask = image > image.mean()
+    viewer.add_labels(mask).contour = 5
+
     viewer.scale_bar.visible = True
 
-    d = viewer2svg(viewer, fit_content=True)
-    d.save_png("pic.png")
+    d = viewer2svg(
+        viewer,
+        fit_content=True,
+        blend_images=True,
+    )
+    # d.save_png("pic.png")
+    d.save_svg("pic.svg")
 
 
 if __name__ == "__main__":

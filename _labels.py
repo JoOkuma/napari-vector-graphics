@@ -1,62 +1,108 @@
 import drawsvg as dw
-import tempfile
-import imageio
-from typing import Sequence
+import warnings
 
 import napari
+import numpy as np
+from skimage.measure import regionprops
+from tqdm import tqdm
+
 from napari.layers import Labels
 from napari.viewer import current_viewer
 
-from _utils import hide_all
+from _utils import hide_all, color2rgba
+
 
 def labels2svg(
     layer: Labels,
     d: dw.Drawing | dw.Group | None = None,
     viewer: napari.Viewer | None = None,
 ) -> dw.Drawing | dw.Group | None:
-    raise NotImplementedError
+    """
+    Convert a napari Labels layer to a drawsvg Drawing.
+
+    Parameters
+    ----------
+    layer : Labels
+        The napari Labels layer to convert.
+    d : dw.Drawing | dw.Group | None
+        The drawsvg Drawing to append to. If None, a new Drawing is created.
+    viewer : napari.Viewer | None
+        The napari viewer to convert from.
+
+    Returns
+    -------
+    d : dw.Drawing
+        The drawsvg Drawing.
+    """
+    warnings.warn(
+        "The resulting segments from this function are simplified, adjust `dp_epsilon` to change the level of simplification."
+        "Set to 0 to disable simplification.",
+        category=UserWarning,
+    )
+
+    warnings.warn(
+        "This function fills holes in the labels.",
+        category=UserWarning,
+    )
+
+    warnings.warn(
+        "This removes segments with less than 3 points.",
+        category=UserWarning,
+    )
+
+    try:
+        import cv2
+
+    except ImportError:
+        raise ImportError("The 'opencv' package is required to convert labels to SVG."
+                          "You can install it with 'pip install opencv-python-headless'.")
 
     if viewer is None:
         viewer = current_viewer()
 
     if d is None:
         height, width = viewer._canvas_size
-        d = dw.Drawing(width, height, id_prefix="image_")
+        d = dw.Drawing(width, height, id_prefix="labels_")
     
-    with hide_all(viewer, layer):
-        image = viewer.window._qt_viewer.canvas._scene_canvas.render(bgcolor="transparent")
+    prev_contour = layer.contour
+    layer.contour = 0
 
-    with tempfile.NamedTemporaryFile(suffix=".png") as f:
-        imageio.imwrite(f.name, image)
-        d.append(
-            dw.Image(
-                0,
-                0,
-                width=image.shape[1],
-                height=image.shape[0],
-                path=f.name,
-                embed=True,
-            )
+    with hide_all(viewer, layer):
+        rgb_image = viewer.window._qt_viewer.canvas._scene_canvas.render(bgcolor="transparent")
+    
+    layer.contour = prev_contour
+    
+    label_image = (rgb_image[..., :3] * (np.arange(3) * 256)).sum(axis=-1)
+
+    fill_ctr = prev_contour == 0
+    width = max(1, prev_contour)
+
+    for props in tqdm(regionprops(label_image), "Converting labels to polygons"):
+        mask: np.ndarray = props.image
+        contours, _ = cv2.findContours(
+            mask.astype(np.uint8),
+            cv2.RETR_EXTERNAL,
+            cv2.CHAIN_APPROX_SIMPLE,
+            offset=(props.bbox[1], props.bbox[0]),
         )
+        color = color2rgba(rgb_image[props.coords[0, 0], props.coords[0, 1]], factor=1)
+        stroke_color = color if not fill_ctr else "none"
+        fill_color = color if fill_ctr else "none"
+
+        for ctr in contours:
+            ctr = ctr.squeeze(axis=1).ravel() + 0.5  # pixel center
+
+            d.append(
+                dw.Lines(
+                    *ctr,
+                    fill=fill_color,
+                    stroke=stroke_color,
+                    stroke_width=layer.contour,
+                    close=True,
+                    stroke_opacity=layer.opacity,
+                    fill_opacity=layer.opacity,
+                    stroke_linejoin='bevel',
+                )
+            )
 
     return d
-
-
-def _main() -> None:
-    import napari
-    from skimage.data import cells3d
-
-    viewer = napari.Viewer()
-    viewer.add_image(cells3d(), channel_axis=1)
-
-    viewer.dims.ndisplay = 3
-    viewer.camera.angles = (15, -30, 145)
-
-    d = labels2svg(viewer.layers[0])
-    d.save_svg("image.svg")
-
-    napari.run()
-
-
-if __name__ == '__main__':
-    _main()

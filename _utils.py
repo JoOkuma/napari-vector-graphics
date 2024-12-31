@@ -9,21 +9,23 @@ from napari.layers import Layer
 from vispy.color import ColorArray
 
 
-def color2rgba(color: ColorArray) -> str:
+def color2rgba(color: ColorArray | np.ndarray, factor: int = 255) -> str:
     """
     Convert a vispy color to an SVG-compatible RGBA string.
 
     Parameters
     ----------
-    color : ColorArray
-        The vispy color to convert.
+    color : ColorArray | np.ndarray
+        The vispy or array color to convert.
+    factor : int
+        The factor to multiply the color values by.
 
     Returns
     -------
     str
         The SVG-compatible RGBA string.
     """
-    return "rgba({}, {}, {}, {})".format(*(color[:4] * 255))
+    return "rgba({}, {}, {}, {})".format(*(color[:4] * factor))
 
 
 @contextmanager
