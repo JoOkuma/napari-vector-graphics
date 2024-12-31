@@ -58,7 +58,6 @@ class NapariVectorGraphicsWidget(QWidget):
         self._layout.addWidget(self._export_btn)
 
     def _open_file_dialog(self) -> None:
-        """Open a file dialog and save the current text content."""
         # Open a save file dialog
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getSaveFileName(
