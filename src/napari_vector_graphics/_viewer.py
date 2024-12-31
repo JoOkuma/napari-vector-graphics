@@ -5,11 +5,11 @@ import drawsvg as dw
 import napari
 from napari.layers import Image, Labels, Tracks
 
-from _image import image2svg
-from _labels import labels2svg
-from _scaler_bar import scaler_bar2svg
-from _tracks import tracks2svg
-from _utils import fit_canvas_to_content
+from napari_vector_graphics._image import image2svg
+from napari_vector_graphics._labels import labels2svg
+from napari_vector_graphics._scaler_bar import scaler_bar2svg
+from napari_vector_graphics._tracks import tracks2svg
+from napari_vector_graphics._utils import fit_canvas_to_content
 
 _LABELS_MODES = ("auto", "raster", "vector")
 

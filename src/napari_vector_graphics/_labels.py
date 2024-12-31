@@ -8,7 +8,7 @@ from napari.viewer import current_viewer
 from skimage.measure import regionprops
 from tqdm import tqdm
 
-from _utils import color2rgba, hide_all
+from napari_vector_graphics._utils import color2rgba, hide_all
 
 
 def labels2svg(

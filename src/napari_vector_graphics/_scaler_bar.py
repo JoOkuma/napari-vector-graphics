@@ -3,8 +3,8 @@ import napari
 from napari._vispy.visuals.scale_bar import ScaleBar
 from napari.viewer import current_viewer
 
-from _line import line2svg
-from _text import text2svg
+from napari_vector_graphics._line import line2svg
+from napari_vector_graphics._text import text2svg
 
 
 def scaler_bar2svg(

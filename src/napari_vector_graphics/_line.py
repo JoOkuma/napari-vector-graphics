@@ -2,7 +2,7 @@ import drawsvg as dw
 import numpy as np
 from vispy.scene.visuals import Line
 
-from _utils import color2rgba
+from napari_vector_graphics._utils import color2rgba
 
 
 def line2svg(

@@ -7,7 +7,7 @@ import napari
 from napari.layers import Image, Labels
 from napari.viewer import current_viewer
 
-from _utils import hide_all
+from napari_vector_graphics._utils import hide_all
 
 
 def image2svg(

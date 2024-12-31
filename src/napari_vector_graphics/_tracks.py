@@ -7,8 +7,8 @@ from napari.layers import Tracks
 from napari.viewer import current_viewer
 from vispy.visuals.line import LineVisual
 
-from _text import text2svg
-from _utils import color2rgba
+from napari_vector_graphics._text import text2svg
+from napari_vector_graphics._utils import color2rgba
 
 
 def _get_track_filter(line_visual: LineVisual) -> TracksFilter:
