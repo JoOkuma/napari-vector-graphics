@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from qtpy.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -10,9 +12,14 @@ from qtpy.QtWidgets import (
 
 from napari_vector_graphics._viewer import viewer2svg
 
+if TYPE_CHECKING:
+    import napari
+
 
 class NapariVectorGraphicsWidget(QWidget):
-    def __init__(self, viewer: "napari.Viewer", parent: QWidget | None = None):
+    def __init__(
+        self, viewer: "napari.viewer.Viewer", parent: QWidget | None = None
+    ):
         super().__init__(parent)
 
         self._viewer = viewer

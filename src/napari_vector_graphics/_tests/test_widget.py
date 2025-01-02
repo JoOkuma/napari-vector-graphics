@@ -1,66 +1,55 @@
-import numpy as np
+from unittest.mock import MagicMock, patch
 
-from napari_vector_graphics._widget import (
-    ExampleQWidget,
-    ImageThreshold,
-    threshold_autogenerate_widget,
-    threshold_magic_widget,
-)
+from qtpy.QtCore import Qt
+
+from napari_vector_graphics._widget import NapariVectorGraphicsWidget
 
 
-def test_threshold_autogenerate_widget():
-    # because our "widget" is a pure function, we can call it and
-    # test it independently of napari
-    im_data = np.random.random((100, 100))
-    thresholded = threshold_autogenerate_widget(im_data, 0.5)
-    assert thresholded.shape == im_data.shape
-    # etc.
-
-
-# make_napari_viewer is a pytest fixture that returns a napari viewer object
-# you don't need to import it, as long as napari is installed
-# in your testing environment
-def test_threshold_magic_widget(make_napari_viewer):
+def test_export_svg(qtbot, make_napari_viewer) -> None:
+    """
+    This test ensures:
+    1) The file dialog is opened (mocked).
+    2) viewer2svg is called with the correct arguments.
+    3) The final .save_svg call uses the returned file path.
+    """
+    # 1) Create a napari viewer using the fixture
     viewer = make_napari_viewer()
-    layer = viewer.add_image(np.random.random((100, 100)))
 
-    # our widget will be a MagicFactory or FunctionGui instance
-    my_widget = threshold_magic_widget()
+    # 2) Instantiate your widget
+    widget = NapariVectorGraphicsWidget(viewer=viewer)
+    qtbot.addWidget(widget)
 
-    # if we "call" this object, it'll execute our function
-    thresholded = my_widget(viewer.layers[0], 0.5)
-    assert thresholded.shape == layer.data.shape
-    # etc.
+    # 3) Patch 'QFileDialog.getSaveFileName' so it does not open a real dialog
+    #    and patch 'viewer2svg' so we can assert calls without doing real I/O.
+    with patch(
+        "napari_vector_graphics._widget.QFileDialog.getSaveFileName",
+        return_value=("test_output.svg", "SVG Files (*.svg)"),
+    ) as mock_dialog, patch(
+        "napari_vector_graphics._widget.viewer2svg"
+    ) as mock_viewer2svg:
 
+        # viewer2svg returns some object with a .save_svg method,
+        # so let's make sure that's also a mock to track calls.
+        mock_svg_obj = MagicMock()
+        mock_viewer2svg.return_value = mock_svg_obj
 
-def test_image_threshold_widget(make_napari_viewer):
-    viewer = make_napari_viewer()
-    layer = viewer.add_image(np.random.random((100, 100)))
-    my_widget = ImageThreshold(viewer)
+        # 4) Simulate a user click on the "Export" button
+        qtbot.mouseClick(widget._export_btn, Qt.LeftButton)
 
-    # because we saved our widgets as attributes of the container
-    # we can set their values without having to "interact" with the viewer
-    my_widget._image_layer_combo.value = layer
-    my_widget._threshold_slider.value = 0.5
+        # 5) Assert the file dialog was indeed called
+        mock_dialog.assert_called_once()
 
-    # this allows us to run our functions directly and ensure
-    # correct results
-    my_widget._threshold_im()
-    assert len(viewer.layers) == 2
+        # 6) Check that viewer2svg was called with the expected arguments
+        blend_checked = widget._blend_imgs_checkbox.isChecked()
+        labels_mode = widget._labels_mode_combobox.currentText()
+        fit_content = widget._fit_content_checkbox.isChecked()
 
+        mock_viewer2svg.assert_called_once_with(
+            viewer=viewer,
+            blend_images=blend_checked,
+            labels_mode=labels_mode,
+            fit_content=fit_content,
+        )
 
-# capsys is a pytest fixture that captures stdout and stderr output streams
-def test_example_q_widget(make_napari_viewer, capsys):
-    # make viewer and add an image layer using our fixture
-    viewer = make_napari_viewer()
-    viewer.add_image(np.random.random((100, 100)))
-
-    # create our widget, passing in the viewer
-    my_widget = ExampleQWidget(viewer)
-
-    # call our widget method
-    my_widget._on_click()
-
-    # read captured output and check that it's as we expected
-    captured = capsys.readouterr()
-    assert captured.out == "napari has 1 layers\n"
+        # 7) Ensure that save_svg was called on the returned object with the chosen path
+        mock_svg_obj.save_svg.assert_called_once_with("test_output.svg")
