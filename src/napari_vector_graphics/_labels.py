@@ -34,13 +34,6 @@ def labels2svg(
         The drawsvg Drawing.
     """
     warnings.warn(
-        "The resulting segments from this function are simplified, adjust `dp_epsilon` to change the level of simplification."
-        "Set to 0 to disable simplification.",
-        category=UserWarning,
-        stacklevel=2,
-    )
-
-    warnings.warn(
         "This function fills holes in the labels.",
         category=UserWarning,
         stacklevel=2,
