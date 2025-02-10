@@ -1,3 +1,4 @@
+import os
 import tempfile
 from typing import Sequence
 
@@ -46,8 +47,10 @@ def image2svg(
             bgcolor="transparent"
         )
 
-    with tempfile.NamedTemporaryFile(suffix=".png") as f:
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
         imageio.imwrite(f.name, image)
+
+    try:
         d.append(
             dw.Image(
                 0,
@@ -58,6 +61,9 @@ def image2svg(
                 embed=True,
             )
         )
+
+    finally:
+        os.unlink(f.name)
 
     return d
 
