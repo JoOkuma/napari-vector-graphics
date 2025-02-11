@@ -1,3 +1,5 @@
+import importlib
+import warnings
 from contextlib import nullcontext
 from typing import Literal
 
@@ -12,7 +14,7 @@ from napari_vector_graphics._tracks import tracks2svg
 from napari_vector_graphics._utils import fit_canvas_to_content
 
 _LABELS_MODES = ("auto", "raster", "vector")
-
+_OPENCV_INSTALLED = importlib.util.find_spec("cv2")
 
 def viewer2svg(
     viewer: napari.Viewer,
@@ -60,7 +62,17 @@ def viewer2svg(
             labels_mode = "raster"
 
     elif labels_mode == "auto":
-        labels_mode = "vector"
+        if _OPENCV_INSTALLED:
+            labels_mode = "vector"
+        else:
+            warnings.warn(
+                "Labels Rendering Mode: Auto defaulted from 'vector' to 'raster'."
+                "'opencv' is required to convert labels as Vectors."
+                "You can install it with 'pip install opencv-python-headless'.",
+                category=UserWarning,
+                stacklevel=2,
+            )
+            labels_mode = "raster"
 
     with fit_canvas_to_content(viewer) if fit_content else nullcontext():
 
