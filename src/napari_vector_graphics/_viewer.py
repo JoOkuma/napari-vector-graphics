@@ -66,7 +66,7 @@ def viewer2svg(
             labels_mode = "vector"
         else:
             warnings.warn(
-                "Labels Rendering Mode: Auto defaulted to Raster."
+                "Labels Rendering Mode: Auto defaulted from 'vector' to 'raster'."
                 "'opencv' is required to convert labels as Vectors."
                 "You can install it with 'pip install opencv-python-headless'.",
                 category=UserWarning,
