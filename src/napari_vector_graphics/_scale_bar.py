@@ -7,7 +7,7 @@ from napari_vector_graphics._line import line2svg
 from napari_vector_graphics._text import text2svg
 
 
-def scaler_bar2svg(
+def scale_bar2svg(
     viewer: napari.Viewer | None,
     d: dw.Drawing | dw.Group,
 ) -> dw.Drawing | dw.Group:

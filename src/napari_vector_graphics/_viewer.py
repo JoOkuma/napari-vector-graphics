@@ -9,12 +9,13 @@ from napari.layers import Image, Labels, Tracks
 
 from napari_vector_graphics._image import image2svg
 from napari_vector_graphics._labels import labels2svg
-from napari_vector_graphics._scaler_bar import scaler_bar2svg
+from napari_vector_graphics._scale_bar import scale_bar2svg
 from napari_vector_graphics._tracks import tracks2svg
 from napari_vector_graphics._utils import fit_canvas_to_content
 
 _LABELS_MODES = ("auto", "raster", "vector")
 _OPENCV_INSTALLED = importlib.util.find_spec("cv2")
+
 
 def viewer2svg(
     viewer: napari.Viewer,
@@ -117,7 +118,7 @@ def viewer2svg(
                 )
 
         if viewer.scale_bar.visible:
-            scaler_bar2svg(viewer, d=d)
+            scale_bar2svg(viewer, d=d)
 
     return d
 
