@@ -22,6 +22,8 @@ def test_viewer2svg(
     viewer.add_labels(mask).contour = 5
 
     viewer.scale_bar.visible = True
+    for layer in viewer.layers:
+        layer.bounding_box.visible = True
 
     d = viewer2svg(
         viewer,

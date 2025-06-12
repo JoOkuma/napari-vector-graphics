@@ -7,8 +7,8 @@ from napari_vector_graphics._utils import color2rgba
 
 def line2svg(
     line_visual: Line,
-    d: dw.Drawing | dw.Group | None,
-) -> dw.Drawing | dw.Group | None:
+    d: dw.Drawing | dw.Group,
+) -> dw.Drawing | dw.Group:
     """
     Convert a vispy LineVisual to a drawsvg Drawing.
 
@@ -30,9 +30,12 @@ def line2svg(
     if not line_visual.visible:
         return d
 
-    if line_visual.connect != "segments":
+    if (
+        isinstance(line_visual.connect, str)
+        and line_visual.connect != "segments"
+    ):
         raise NotImplementedError(
-            f"Only 'segments' connection is supported, got {line_visual.connect}."
+            f"Only 'segments' and `np.ndarray` connection is supported, got {line_visual.connect}."
         )
 
     line_visual.update()
@@ -41,22 +44,30 @@ def line2svg(
         line_visual.pos
     )
 
-    if d is None:
-        d = dw.Drawing()
-
     if pos.ndim == 1:
         pos = np.atleast_2d(pos)
 
     pos = pos[:, :2]
 
-    for i in range(0, len(pos), 2):
-        d.append(
-            dw.Line(
-                *pos[i],
-                *pos[i + 1],
-                stroke=color2rgba(line_visual.color),
-                stroke_width=line_visual.width,
+    if isinstance(line_visual.connect, str):
+        for i in range(0, len(pos), 2):
+            d.append(
+                dw.Line(
+                    *pos[i],
+                    *pos[i + 1],
+                    stroke=color2rgba(line_visual.color),
+                    stroke_width=line_visual.width,
+                )
             )
-        )
+    else:
+        for i, j in line_visual.connect:
+            d.append(
+                dw.Line(
+                    *pos[i],
+                    *pos[j],
+                    stroke=color2rgba(line_visual.color),
+                    stroke_width=line_visual.width,
+                )
+            )
 
     return d
