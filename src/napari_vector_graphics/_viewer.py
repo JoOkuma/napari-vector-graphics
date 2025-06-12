@@ -7,6 +7,7 @@ import drawsvg as dw
 import napari
 from napari.layers import Image, Labels, Tracks
 
+from napari_vector_graphics._bounding_box import bounding_box2svg
 from napari_vector_graphics._image import image2svg
 from napari_vector_graphics._labels import labels2svg
 from napari_vector_graphics._scale_bar import scale_bar2svg
@@ -87,7 +88,7 @@ def viewer2svg(
                 for layer in viewer.layers
                 if isinstance(layer, Image) and layer.visible
             ]
-            image2svg(blending_layers, d=d, viewer=viewer)
+            d = image2svg(blending_layers, d=d, viewer=viewer)
 
         for layer in viewer.layers:
             if not layer.visible:
@@ -117,6 +118,9 @@ def viewer2svg(
                     f"Layer type {type(layer)} not supported yet. Disable the layer and try again."
                 )
 
+            if layer.bounding_box.visible:
+                d = bounding_box2svg(layer, d=d, viewer=viewer)
+
         if viewer.scale_bar.visible:
             scale_bar2svg(viewer, d=d)
 
@@ -135,6 +139,8 @@ def _main() -> None:
     viewer.add_labels(mask).contour = 5
 
     viewer.scale_bar.visible = True
+    for layer in viewer.layers:
+        layer.bounding_box.visible = True
 
     d = viewer2svg(
         viewer,
